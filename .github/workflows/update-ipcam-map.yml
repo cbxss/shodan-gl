@@ -1,0 +1,36 @@
+name: Update IP Camera Map
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sunday at midnight UTC
+  workflow_dispatch:      # Allow manual trigger
+
+jobs:
+  update-map:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install shodan pandas folium
+    
+    - name: Run IP camera mapping script
+      env:
+        SHODAN_API_KEY: ${{ secrets.SHODAN_API_KEY }}
+      run: python shodan_ipcam_map.py
+    
+    - name: Commit and push updates
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add ipcam_map.html ipcam_data.csv
+        git diff --staged --quiet || git commit -m "🗺️ Weekly IP camera map update"
+        git push
