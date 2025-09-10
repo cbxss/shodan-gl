@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/ipcam_map.html"
+    }
+  ]
+}
